@@ -29,38 +29,31 @@ static NSArray* allowedFormats;
 
 
 - (void) main {
-    // Use format to change deserialization class and convert serialized string into resources
-    Class newClass = [resourceClass performSelector:@selector(deserializerClassForFormat:) withObject:[self format]];
-    if (newClass != nil) {
-        
-        // Get Core Manager from resource class if it hasn't been defined yet
-        if (coreManager == nil)
-            coreManager = [[resourceClass performSelector:@selector(coreManager)] retain];
+  // Get Core Manager from resource class if it hasn't been defined yet
+  if (coreManager == nil)
+    coreManager = [[resourceClass performSelector:@selector(coreManager)] retain];  
+                
+  // Create "scratchpad" object context; we will merge this context into the main context once deserialization is complete
+  managedObjectContext = [[coreManager newContext] retain];
+  [[NSNotificationCenter defaultCenter] addObserver:self 
+      selector:@selector(contextDidSave:) 
+      name:NSManagedObjectContextDidSaveNotification 
+      object:managedObjectContext];
 
-        // Create "scratchpad" object context; we will merge this context into the main context once deserialization is complete
-        managedObjectContext = [[coreManager newContext] retain];
-        [[NSNotificationCenter defaultCenter] addObserver:self 
-            selector:@selector(contextDidSave:) 
-            name:NSManagedObjectContextDidSaveNotification 
-            object:managedObjectContext];
+  resources = [[self resourcesFromString:[self sourceString]] retain];
 
-        resources = [[self resourcesFromString:[self sourceString]] retain];
+  // Attempt to save object context; if there's an error, it will be placed in the CoreResult (which is sent to the target)
+  [managedObjectContext save:&error];
+  
+  [self performSelectorOnMainThread:@selector(notify) withObject:nil waitUntilDone:NO];
+      
+  // Remove context save observer
+  [[NSNotificationCenter defaultCenter] removeObserver:self 
+      name:NSManagedObjectContextDidSaveNotification object:managedObjectContext];            
 
-        // Attempt to save object context; if there's an error, it will be placed in the CoreResult (which is sent to the target)
-        [managedObjectContext save:&error];
-        
-        [self performSelectorOnMainThread:@selector(notify) withObject:nil waitUntilDone:NO];
-            
-        // Remove context save observer
-        [[NSNotificationCenter defaultCenter] removeObserver:self 
-            name:NSManagedObjectContextDidSaveNotification object:managedObjectContext];
-            
-        return;
-    }
-
-    // Log error if level is high enough
-    if (error != nil && coreManager.logLevel > 3)
-        NSLog(@"CoreDeserializer error: %@", [error description]);
+  // Log error if level is high enough
+  if (error != nil && coreManager.logLevel > 3)
+      NSLog(@"CoreDeserializer error: %@", [error description]);
 }
 
 

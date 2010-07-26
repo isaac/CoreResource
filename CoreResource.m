@@ -32,6 +32,10 @@
     return [[self coreManager] remoteSiteURL];
 }
 
++ (NSString*) remoteSiteFormat {
+    return [[self coreManager] remoteSiteFormat];
+}
+
 + (NSString*) remoteCollectionName {
     return [[[NSStringFromClass(self) deCamelizeWith:@"_"] substringFromIndex:1] stringByAppendingString:@"s"];
 }
@@ -103,8 +107,8 @@
     return [self dateParser];
 }
 
-+ (Class) deserializerClassForFormat:(NSString*)format {
-    return NSClassFromString($S(@"Core%@Deserializer", [format uppercaseString]));
++ (Class) deserializerClass {
+    return NSClassFromString($S(@"Core%@Deserializer", [[self remoteSiteFormat] uppercaseString]));
 }
 
 /**
@@ -603,7 +607,7 @@
 
 + (void) findRemote:(id)resourceId andNotify:(id)del withSelector:(SEL)selector {
     CoreRequest *request = [[[CoreRequest alloc] initWithURL:
-        [CoreUtils URLWithSite:[self remoteURLForResource:resourceId action:Read] andFormat:@"json" andParameters:nil]] autorelease];
+        [CoreUtils URLWithSite:[self remoteURLForResource:resourceId action:Read] andFormat:[self remoteSiteFormat] andParameters:nil]] autorelease];
     request.delegate = self;
     request.didFinishSelector = @selector(findRemoteDidFinish:);
     request.didFailSelector = @selector(findRemoteDidFail:);
@@ -632,7 +636,7 @@
 
 + (void) findAllRemote:(id)parameters andNotify:(id)del withSelector:(SEL)selector {
     CoreRequest *request = [[[CoreRequest alloc] initWithURL:
-        [CoreUtils URLWithSite:[self remoteURLForCollectionAction:Read] andFormat:@"json" andParameters:parameters]] autorelease];
+        [CoreUtils URLWithSite:[self remoteURLForCollectionAction:Read] andFormat:[self remoteSiteFormat] andParameters:parameters]] autorelease];
     request.delegate = self;
     request.didFinishSelector = @selector(findRemoteDidFinish:);
     request.didFailSelector = @selector(findRemoteDidFail:);
@@ -653,7 +657,7 @@
 
 + (void) findRemoteDidFinish:(CoreRequest*)request {
     // Create and enqueue deserializer in non-blocking thread
-    CoreDeserializer* deserializer = [[CoreJSONDeserializer alloc] initWithSource:request andResourceClass:self];
+    CoreDeserializer* deserializer = [[[self deserializerClass] alloc] initWithSource:request andResourceClass:self];
     deserializer.target = request.coreDelegate;
     deserializer.action = request.coreSelector;
     [[[self coreManager] deserialzationQueue] addOperation:deserializer];

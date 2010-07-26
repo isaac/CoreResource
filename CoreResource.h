@@ -31,6 +31,7 @@ typedef enum _Action {
 + (BOOL) useBundleRequests;
 
 + (NSString*) remoteSiteURL;
++ (NSString*) remoteSiteFormat;
 + (NSString*) remoteCollectionName;
 + (NSString*) remoteURLForCollectionAction:(Action)action;
 + (NSString*) remoteURLForResource:(id)resourceId action:(Action)action;
@@ -55,7 +56,7 @@ typedef enum _Action {
 + (NSDateFormatter*) dateParser;
 + (NSDateFormatter*) dateParserForField:(NSString*)field;
 
-+ (Class) deserializerClassForFormat:(NSString*)format;
++ (Class) deserializerClass;
 //+ (id) resourceCollectionFromJSONCollection:(id)jsonCollection withParent:(id)parent;
 //+ (id) resourcePropertiesFromJSONElement:(id)jsonElement withParent:(id)parent;
 

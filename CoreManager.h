@@ -17,6 +17,7 @@
     NSOperationQueue *deserialzationQueue;
     
     NSString *remoteSiteURL;
+    NSString *remoteSiteFormat;
     
     // Default setting for whether or not to get data from within the bundle (instead of performing remote HTTP requests)
     BOOL useBundleRequests;
@@ -42,6 +43,7 @@
 @property (nonatomic, retain) NSOperationQueue *deserialzationQueue;
 
 @property (nonatomic, retain) NSString *remoteSiteURL;
+@property (nonatomic, retain) NSString *remoteSiteFormat;
 @property (nonatomic, assign) BOOL useBundleRequests;
 @property (nonatomic, assign) float bundleRequestDelay;
 

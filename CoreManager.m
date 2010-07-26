@@ -16,7 +16,7 @@
 
 @synthesize persistentStoreCoordinator, managedObjectContext, managedObjectModel;
 @synthesize requestQueue, deserialzationQueue;
-@synthesize remoteSiteURL, useBundleRequests, bundleRequestDelay, defaultDateParser;
+@synthesize remoteSiteURL, remoteSiteFormat, useBundleRequests, bundleRequestDelay, defaultDateParser;
 @synthesize entityDescriptions, modelProperties, modelRelationships, modelAttributes;
 @synthesize logLevel;
 
@@ -53,6 +53,9 @@ static CoreManager* _main;
         bundleRequestDelay = 0;
         
         logLevel = 1;
+        
+        if (remoteSiteFormat == nil)
+          remoteSiteFormat = @"json";
         
         // ===== Core Data initialization ===== //
         
@@ -170,6 +173,7 @@ static CoreManager* _main;
     [modelRelationships release];
 
     [remoteSiteURL release];
+    [remoteSiteFormat release];
 
     [managedObjectContext release];
     [managedObjectModel release];
