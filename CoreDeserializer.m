@@ -324,3 +324,10 @@ static NSArray* allowedFormats;
 
 #endif
 
+@implementation CorePLISTDeserializer
+
+- (NSArray*) resourcesFromString:(NSString*)string {  
+  return [self resourcesFromData:[NSPropertyListSerialization propertyListFromData:[source responseData] mutabilityOption:0 format:nil errorDescription:nil]];
+}
+
+@end

@@ -83,3 +83,6 @@
 @interface CoreXMLDeserializer : CoreDeserializer 
 @end
 #endif
+
+@interface CorePLISTDeserializer : CoreDeserializer 
+@end
